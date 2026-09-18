@@ -316,12 +316,12 @@
             <div class="input-group">
                 <div class="input-header">
                     <span class="input-label">Loan Amount (GHS)</span>
-                    <span class="input-value" id="amountValue">GHS 1,000</span>
+                    <span class="input-value" id="amountValue">GHS 20,000</span>
                 </div>
-                <input type="range" class="slider" min="50" max="5000" step="50" value="1000" id="amountSlider">
+                <input type="range" class="slider" min="5000" max="55000" step="1000" value="20000" id="amountSlider">
                 <div class="range-labels">
-                    <span>GHS 50</span>
                     <span>GHS 5,000</span>
+                    <span>GHS 55,000</span>
                 </div>
             </div>
 
@@ -329,19 +329,19 @@
             <div class="input-group">
                 <div class="input-header">
                     <span class="input-label">Loan Term</span>
-                    <span class="input-value" id="termValue">30 days</span>
+                    <span class="input-value" id="termValue">12 months</span>
                 </div>
-                <input type="range" class="slider" min="7" max="90" step="1" value="30" id="termSlider">
+                <input type="range" class="slider" min="3" max="24" step="3" value="12" id="termSlider">
                 <div class="range-labels">
-                    <span>7 days</span>
-                    <span>90 days</span>
+                    <span>3 months</span>
+                    <span>24 months</span>
                 </div>
             </div>
 
             <!-- Monthly Payment -->
             <div class="payment-box">
-                <span class="payment-label">📅 Repayment Amount</span>
-                <span class="payment-amount" id="paymentAmount">GHS 1,050.00</span>
+                <span class="payment-label">📅 Monthly Payment</span>
+                <span class="payment-amount" id="paymentAmount">GHS 1,758.35</span>
             </div>
         </div>
 
@@ -404,17 +404,18 @@
         // ============================================
         function updateCalculator() {
             const amount = parseFloat(amountSlider.value);
-            const days = parseFloat(termSlider.value);
+            const months = parseFloat(termSlider.value);
 
             amountValue.textContent = 'GHS ' + amount.toLocaleString();
-            termValue.textContent = days + (days === 1 ? ' day' : ' days');
+            termValue.textContent = months + (months === 1 ? ' month' : ' months');
 
-            // Ghana MoMo loan interest calculation
-            // Using 5% flat interest for the loan period
-            const interestRate = 0.05;
-            const totalRepayment = amount * (1 + interestRate);
+            // Monthly payment calculation (simple interest ~10% APR)
+            const annualRate = 0.10;
+            const monthlyRate = annualRate / 12;
+            const power = Math.pow(1 + monthlyRate, months);
+            const monthlyPayment = amount * (monthlyRate * power) / (power - 1);
 
-            paymentAmount.textContent = 'GHS ' + totalRepayment.toFixed(2);
+            paymentAmount.textContent = 'GHS ' + monthlyPayment.toFixed(2);
         }
 
         updateCalculator();
