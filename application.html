@@ -185,7 +185,7 @@
             border-radius: 12px;
             background: white;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13px;
             color: #1a1a2e;
             cursor: pointer;
             transition: all 0.2s;
@@ -278,6 +278,10 @@
                 font-size: 14px;
                 padding: 10px 12px;
             }
+            .amount-quick button {
+                font-size: 12px;
+                padding: 8px 4px;
+            }
         }
     </style>
 </head>
@@ -310,27 +314,27 @@
         <!-- Loan Amount -->
         <div class="form-group">
             <label class="form-label">Loan Amount (GHS) <span class="required">*</span></label>
-            <input type="number" class="form-input" id="loanAmount" placeholder="1000" min="50" max="5000">
+            <input type="number" class="form-input" id="loanAmount" placeholder="20000" min="5000" max="55000">
             <div class="amount-quick">
-                <button onclick="setAmount(100)">GHS 100</button>
-                <button onclick="setAmount(500)">GHS 500</button>
-                <button onclick="setAmount(1000)">GHS 1,000</button>
-                <button onclick="setAmount(2000)">GHS 2,000</button>
-                <button onclick="setAmount(3000)">GHS 3,000</button>
                 <button onclick="setAmount(5000)">GHS 5,000</button>
+                <button onclick="setAmount(10000)">GHS 10,000</button>
+                <button onclick="setAmount(20000)">GHS 20,000</button>
+                <button onclick="setAmount(30000)">GHS 30,000</button>
+                <button onclick="setAmount(45000)">GHS 45,000</button>
+                <button onclick="setAmount(55000)">GHS 55,000</button>
             </div>
-            <div class="error-text" id="amountError">Please enter amount between GHS 50 and GHS 5,000</div>
+            <div class="error-text" id="amountError">Please enter amount between GHS 5,000 and GHS 55,000</div>
         </div>
 
         <!-- Loan Term -->
         <div class="form-group">
             <label class="form-label">Loan Term <span class="required">*</span></label>
             <select class="form-select" id="loanTerm">
-                <option>7 Days</option>
-                <option>14 Days</option>
-                <option selected>30 Days</option>
-                <option>60 Days</option>
-                <option>90 Days</option>
+                <option>3 Months</option>
+                <option>6 Months</option>
+                <option selected>12 Months</option>
+                <option>18 Months</option>
+                <option>24 Months</option>
             </select>
         </div>
 
@@ -359,7 +363,7 @@
         if (storedTerm) {
             const termSelect = document.getElementById('loanTerm');
             for (let option of termSelect.options) {
-                if (option.value === storedTerm + ' Days') {
+                if (option.value === storedTerm + ' Months') {
                     option.selected = true;
                     break;
                 }
@@ -399,8 +403,8 @@
             amountError.classList.remove('show');
             purposeError.classList.remove('show');
 
-            // Validate amount (GHS 50 - GHS 5,000)
-            if (!amount || parseFloat(amount) < 50 || parseFloat(amount) > 5000) {
+            // Validate amount (GHS 5,000 - GHS 55,000)
+            if (!amount || parseFloat(amount) < 5000 || parseFloat(amount) > 55000) {
                 amountInput.classList.add('invalid');
                 amountError.classList.add('show');
                 valid = false;
@@ -425,7 +429,7 @@
             // Save to localStorage
             localStorage.setItem('loanType', document.getElementById('loanType').value);
             localStorage.setItem('loanAmount', amount);
-            localStorage.setItem('loanTerm', document.getElementById('loanTerm').value.replace(' Days', ''));
+            localStorage.setItem('loanTerm', document.getElementById('loanTerm').value.replace(' Months', ''));
             localStorage.setItem('loanPurpose', purpose);
 
             // Navigate to details page
@@ -437,7 +441,7 @@
         // ============================================
         document.getElementById('loanAmount').addEventListener('input', function() {
             const val = parseFloat(this.value);
-            if (val >= 50 && val <= 5000) {
+            if (val >= 5000 && val <= 55000) {
                 this.classList.remove('invalid');
                 document.getElementById('amountError').classList.remove('show');
             }
